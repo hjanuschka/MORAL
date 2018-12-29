@@ -21,6 +21,14 @@ IPVS on steriods
 
 
 
+# IPVS commands
+## Add service
+  ipvsadm -A -t  192.168.0.1:8080 -s rr
+
+## add real server
+  ipvsadm -a -t 192.168.0.1:8080 -r 192.168.0.4:8080 -m
+  
+
 
 ruby objects
   App
