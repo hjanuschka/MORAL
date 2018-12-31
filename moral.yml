@@ -1,0 +1,94 @@
+type: ipvs
+balancers:
+  balancer1:
+    protocol: TCP
+    scheduler: rr
+    address: 192.168.239.6
+    port: 8080
+    nodes:
+      alisa:
+        active: true
+        type: node
+        # g = direct routing (gatwaying)
+        # m = masquerading
+        # i = ipip (tunneling)
+        routing: m
+        weight: 1
+        address: 192.168.239.1
+        port: 80
+        health:
+          window:
+            interval: 10s
+            dead_on: 1
+            back_on: 1
+          type: tcp
+          definition:
+            timeout: 2
+      moritz:
+        type: node
+        routing: m
+        weight: 1
+        address: 192.168.239.2
+        port: 80
+        health:
+          type: http
+          window:
+            interval: 10s
+            dead_on: 1
+            back_on: 1
+          definition:
+            endpoint: /v1/health
+            timeout: 2
+            expectet:
+              content: "some string"
+              status: 200
+      docker_container:
+        type: docker
+        routing: m
+        weight: 1
+        address: 192.168.239.2
+        port: 80
+        docker:
+          name: ^frontend^
+          port: 8088
+          dynamic: true
+        health:
+          type: http
+          window:
+            interval: 10s
+            dead_on: 1
+            back_on: 1
+          definition:
+            endpoint: /v1/health
+            timeout: 2
+            expectet:
+              content: "some string"
+              status: 200
+
+
+  balancer2:
+    protocol: TCP
+    scheduler: rr
+    address: 192.168.239.6
+    port: 8081
+    nodes:
+      alisa:
+        type: node
+        # g = direct routing (gatwaying)
+        # m = masquerading
+        # i = ipip (tunneling)
+        routing: m
+        weight: 1
+        address: 192.168.239.1
+        port: 81
+        health:
+          window:
+            interval: 10s
+            dead_on: 1
+            back_on: 1
+          type: tcp
+          definition:
+            timeout: 2
+
+
+

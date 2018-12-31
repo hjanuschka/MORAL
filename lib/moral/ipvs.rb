@@ -11,13 +11,23 @@ module Moral
     def initialize(parameters: {})
       @remote_address = parameters['RemoteAddress:Port']
       @forward = parameters['Forward']
-      @weight = parameters['weight']
-      @active_connections = parameters['ActiveConn']
-      @inactive_connections = parameters['InActConn']
+      @weight = parameters['Weight'].to_i
+      @active_connections = parameters['ActiveConn'].to_i
+      @inactive_connections = parameters['InActConn'].to_i
       @service = parameters['service']
     end
-    def create!()
 
+    def remove!
+      cmd = "ipvsadm -d -t #{@service.local_address} -r #{@remote_address}"
+      IPVS.command(cmd) do |stdout, status|
+      end
+    end
+
+    def create!
+      # create nodes
+      cmd = "ipvsadm -a -t #{@service.local_address} -r #{@remote_address} -#{@forward}"
+      IPVS.command(cmd) do |stdout, status|
+      end
     end
   end
   class IPVSService
@@ -33,37 +43,59 @@ module Moral
       @nodes ||= []
     end
 
-    def create!()
-      # create via ipvsadm
-      # call create! on each node
+    def create!
+      # Create Service
+      cmd = "ipvsadm -A -t  #{@local_address} -s #{@scheduler}"
+      IPVS.command(cmd) do |stdout, status|
+      end
+      @nodes.each(&:create!)
     end
+
+    def node?(address)
+      @nodes.each do |node|
+        return node if node.remote_address == address
+      end
+      nil
+    end
+
     def add_node(parameters: {})
       parameters['service'] = self
       n = IPVSServer.new(parameters: parameters)
       @nodes.push(n)
+      n
     end
   end
   class IPVS
     def self.flush
-      command("ipvsadm --clear")
+      command('ipvsadm --clear')
     end
+
+    def self.service?(service)
+      table.each do |svc|
+        return svc if svc.local_address == service
+      end
+      nil
+    end
+
     def self.table
       # REDO with a C/rust plugin
       # sample: -> https://github.com/collectd/collectd/blob/master/src/ipvs.c
       @table = []
       headers = []
-      svc = {}
+      svc = nil
+      svc_raw = {}
       command('ipvsadm -L -n') do |stdout, _status|
         stdout.split("\n").each_with_index do |l, i|
-
           headers.push(l.split) unless i > 2
           next unless i > 2
+
           packets = l.split
           if ([packets.first] & %w[TCP UDP]).any?
+            svc_raw = {}
             packets.each_with_index do |_p, x|
-              svc[headers[1][x]] = packets[x]
+              svc_raw[headers[1][x]] = packets[x]
             end
-            svc = IPVSService.new(parameters: svc)
+            svc = IPVSService.new(parameters: svc_raw)
             @table.push(svc)
           else
             server = {}
