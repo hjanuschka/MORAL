@@ -3,4 +3,6 @@ services:
   balancer:
     privileged: true
     build: .
+    volumes:
+      - .:/src
 
