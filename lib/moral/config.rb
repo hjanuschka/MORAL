@@ -24,7 +24,6 @@ module Moral
         nodes.each_pair do |name, options|
           node_config = OpenStruct.new(options)
           health_config = OpenStruct.new(node_config.health)
-          next unless node_config.type == 'node'
           hl = Moral::HealthCheck
           health = Object.const_get(hl.to_s).new(
             type: health_config.type,
@@ -35,6 +34,7 @@ module Moral
           )
 
           cl = Moral::Node
+          cl = Moral::DockerNode if node_config.type == 'docker'
           # FIXME - change cl, if node is docker
           node = Object.const_get(cl.to_s).new(name: name,
                                           routing: node_config.routing,
@@ -43,7 +43,8 @@ module Moral
                                           address: node_config.address,
                                           port: node_config.port,
                                           health_check: health,
-                                          balancer: balancer)
+                                          balancer: balancer,
+                                          payload: node_config.payload || nil)
 
           balancer.add_node(node: node)
         end

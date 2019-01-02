@@ -1,5 +1,6 @@
 module Moral
   class IPVS
+    attr_accessor :cfg
     def initialize
       @cfg = Moral::Config.new
     end
@@ -16,11 +17,12 @@ module Moral
     # end
 
     def service?(address: nil, port: nil)
-      @table.each do | balancer |
-          return balancer if balancer.address == address && balancer.port == port
+      @table.each do |balancer|
+        return balancer if balancer.address == address && balancer.port == port
       end
-      return nil
+      nil
     end
+
     def create_table
       @cfg.balancers.each do |balancer|
         loaded_balancer = service?(address: balancer.address, port: balancer.port)
@@ -28,25 +30,19 @@ module Moral
         # check if it is still in current live table
         # if so -> remove
         unless balancer.active
-          if loaded_balancer
-           loaded_balancer.remove!
-          end
+          loaded_balancer&.remove!
           next
         end
 
         # if it does not already exist in live table
         # create it
-        unless loaded_balancer
-          balancer.create!
-        else
+        if loaded_balancer
           balancer.update!
           # remove gone nodes
-          balancer.nodes.each do | node |
+          balancer.nodes.each do |node|
             loaded_node = loaded_balancer.node?(address: node.address, port: node.port)
             unless node.active
-              if loaded_node
-                loaded_node.remove!
-              end
+              loaded_node.remove!
               next
             end
             if loaded_balancer.node?(address: node.address, port: node.port)
@@ -59,6 +55,10 @@ module Moral
           end
           # check nodes, add missing, remove gone ones
           # CHECK changes
+          # FIXMEEEE
+          balancer.remove_gone!
+        else
+          balancer.create!
         end
       end
     end
@@ -83,13 +83,13 @@ module Moral
             end
             addr = svc_raw['LocalAddress:Port'].split(':')
 
-              svc = Balancer.new(
-                protocol: svc_raw['Prot'],
-                scheduler: svc_raw['Scheduler'],
-                active: true,
-                address: addr[0],
-                port: addr[1].to_i
-              )
+            svc = Balancer.new(
+              protocol: svc_raw['Prot'],
+              scheduler: svc_raw['Scheduler'],
+              active: true,
+              address: addr[0],
+              port: addr[1].to_i
+            )
             table.push(svc)
           else
             server = {}
@@ -99,14 +99,14 @@ module Moral
             cl = Moral::Node
             # FIXME - change cl, if node is docker
             addr = server['RemoteAddress:Port'].split(':')
-            r = "m"
+            r = 'm'
             case server['Forward']
-              when "Masq"
-                r = "m"
-              when "Route"
-                r = "g"
-              when "Tunnel"
-                r = "i"
+            when 'Masq'
+              r = 'm'
+            when 'Route'
+              r = 'g'
+            when 'Tunnel'
+              r = 'i'
             end
 
             node = Object.const_get(cl.to_s).new(name: nil,

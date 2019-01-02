@@ -45,9 +45,7 @@ balancers:
         type: docker
         routing: m
         weight: 1
-        address: 192.168.239.2
-        port: 80
-        docker:
+        payload:
           name: ^frontend^
           port: 8088
           dynamic: true

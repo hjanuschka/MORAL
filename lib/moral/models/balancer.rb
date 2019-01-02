@@ -30,6 +30,7 @@ module Moral
     def update!
       # FIXME
     end
+
     def node?(address: nil, port: nil)
       @nodes.each do |node|
         return node if node.address == address && node.port = port
@@ -41,6 +42,9 @@ module Moral
       "#{address}:#{port}"
     end
 
+    def remove_gone!
+      @nodes.each(&:remove_gone!)
+    end
     def remove!
       @nodes.each(&:remove!)
       Moral::Misc.command("ipvsadm -D -t #{service_address}")
