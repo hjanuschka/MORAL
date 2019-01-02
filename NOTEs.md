@@ -1,5 +1,5 @@
 ###### MorAl
-
+Optix for CLI grouping
 sinatra web server
 react ui
   parcel bundler

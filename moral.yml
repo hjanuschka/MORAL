@@ -17,14 +17,14 @@ balancers:
         address: 192.168.239.1
         port: 80
         health:
-          window:
-            interval: 10s
-            dead_on: 1
-            back_on: 1
+          interval: 10s
+          dead_on: 1
+          back_on: 1
           type: tcp
           definition:
             timeout: 2
       moritz:
+        active: true
         type: node
         routing: m
         weight: 1
@@ -32,10 +32,9 @@ balancers:
         port: 80
         health:
           type: http
-          window:
-            interval: 10s
-            dead_on: 1
-            back_on: 1
+          interval: 10s
+          dead_on: 1
+          back_on: 1
           definition:
             endpoint: /v1/health
             timeout: 2
@@ -54,10 +53,9 @@ balancers:
           dynamic: true
         health:
           type: http
-          window:
-            interval: 10s
-            dead_on: 1
-            back_on: 1
+          interval: 10s
+          dead_on: 1
+          back_on: 1
           definition:
             endpoint: /v1/health
             timeout: 2
@@ -68,6 +66,7 @@ balancers:
 
   balancer2:
     protocol: TCP
+    active: true
     scheduler: rr
     address: 192.168.239.6
     port: 8081
