@@ -16,6 +16,22 @@ require 'json'
 require 'ostruct'
 require 'pry'
 
+
+# start threads
+
+# TABLE CREATE
 ipvs = Moral::IPVS.new
+
+# Thread1
+# WatchDog
+#
+#
+# Thread2
+#
+# Docker Thread
+#
+# Thread3
+#
+# Sinatra
 
 ipvs.run

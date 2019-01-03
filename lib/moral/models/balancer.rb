@@ -6,7 +6,6 @@ module Moral
     attr_accessor :port
     attr_accessor :name
     attr_accessor :active
-    attr_accessor :nodes
 
     def initialize(protocol: 'TCP',
       scheduler: 'rr',
@@ -27,6 +26,14 @@ module Moral
       @nodes = []
     end
 
+    def nodes
+      fin = []
+      @nodes.each do |no|
+        fin << no if no.type == 'node'
+      end
+      fin
+    end
+
     def update!
       # FIXME
     end
@@ -45,6 +52,7 @@ module Moral
     def remove_gone!
       @nodes.each(&:remove_gone!)
     end
+
     def remove!
       @nodes.each(&:remove!)
       Moral::Misc.command("ipvsadm -D -t #{service_address}")

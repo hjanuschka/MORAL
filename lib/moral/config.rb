@@ -34,7 +34,7 @@ module Moral
           )
 
           cl = Moral::Node
-          cl = Moral::DockerNode if node_config.type == 'docker'
+          next if node_config.type == 'docker'
           # FIXME - change cl, if node is docker
           node = Object.const_get(cl.to_s).new(name: name,
                                           routing: node_config.routing,
