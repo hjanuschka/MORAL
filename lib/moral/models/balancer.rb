@@ -62,7 +62,7 @@ module Moral
       # FIXME check existance
       Moral::Misc.command("ipvsadm -A -t #{service_address}  -s #{@scheduler}")
       @nodes.each do |node|
-        next unless node.active
+        next unless node.active && node.alive
         node.create!
       end
     end

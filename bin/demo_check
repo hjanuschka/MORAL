@@ -1,0 +1,9 @@
+#!/bin/bash
+
+
+echo $MORAL_BALANCER
+echo "GOOD"
+# 0 == GOOD
+# 1 == WARN === UNUSED
+# 2 == BAD
+exit 0

@@ -8,6 +8,19 @@ module Moral
     attr_accessor :port
     attr_accessor :name
     attr_accessor :payload
+    attr_accessor :health_check
+    attr_accessor :alive
+    attr_accessor :balancer
+
+    def fall!
+      @weight = 0
+      update!
+    end
+
+    def rise!
+      @weight = @config_weight
+      update!
+    end
 
     def initialize(type: 'node',
       active: true,
@@ -23,7 +36,7 @@ module Moral
       @type = type
       @active = active
       @routing = routing
-      @weight = weight
+      @weight = 0
       @address = address
       @port = port
       @name = name
@@ -32,6 +45,8 @@ module Moral
       @payload = payload
 
       @active = true if @active.nil?
+      @alive = true
+      @config_weight = weight
     end
 
     def server_address
@@ -39,8 +54,9 @@ module Moral
     end
 
     def remove_gone!
-      puts "check if i got removed #{server_address}"
+      # puts "check if i got removed #{server_address}"
     end
+
     def remove!
       Moral::Misc.command("ipvsadm -d -t #{@balancer.service_address} -r #{server_address}")
     end

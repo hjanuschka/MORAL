@@ -2,6 +2,11 @@ module Moral
   class Config
     attr_accessor :balancers
 
+    def self.instance
+      @cfg_instance ||= new
+      @cfg_instance
+    end
+
     def initialize
       ENV['MORAL_CONFIG'] ||= 'moral.yml'
       @config = YAML.load_file(ENV['MORAL_CONFIG'])
@@ -24,10 +29,9 @@ module Moral
         nodes.each_pair do |name, options|
           node_config = OpenStruct.new(options)
           health_config = OpenStruct.new(node_config.health)
-          hl = Moral::HealthCheck
-          health = Object.const_get(hl.to_s).new(
+          health = Moral::HealthCheck.factory(
             type: health_config.type,
-            interval: health_config.interval,
+            interval: health_config.interval.to_i,
             dead_on: health_config.dead_on,
             back_on: health_config.back_on,
             definition: health_config.definition
@@ -46,6 +50,7 @@ module Moral
                                           balancer: balancer,
                                           payload: node_config.payload || nil)
 
+          health.node = node
           balancer.add_node(node: node)
         end
       end

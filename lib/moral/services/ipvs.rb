@@ -2,12 +2,17 @@ module Moral
   class IPVS
     attr_accessor :cfg
     def initialize
-      @cfg = Moral::Config.new
+      @cfg = Moral::Config.instance
     end
 
-    def run
+    def update_table
       # clear_table
       clear_table if ENV['IPVS_CLEAR']
+      @table = load_table
+      create_table
+    end
+
+    def patch_table
       @table = load_table
       create_table
     end
@@ -41,8 +46,8 @@ module Moral
           # remove gone nodes
           balancer.nodes.each do |node|
             loaded_node = loaded_balancer.node?(address: node.address, port: node.port)
-            unless node.active
-              loaded_node.remove!
+            unless node.active && node.alive
+              node.remove!
               next
             end
             if loaded_balancer.node?(address: node.address, port: node.port)

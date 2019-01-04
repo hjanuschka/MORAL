@@ -7,7 +7,7 @@ module Moral
     def create!
       # FIXME
       binding.pry
-      @docker_nodes ||=[]
+      @docker_nodes ||= []
       puts 'DOCKER CREATE'
       # create multiple nodes
       n = Node.new(name: 'ha1', address: '127.0.0.2', port: 811, health_check: @health_check, balancer: @balancer)
@@ -19,10 +19,9 @@ module Moral
       n.create!
     end
 
-
     def remove_gone!
-      puts "DOCKER check if i got removed"
-      #@docker_nodes.map(&:remove!)
+      puts 'DOCKER check if i got removed'
+      # @docker_nodes.map(&:remove!)
     end
 
     def update!
