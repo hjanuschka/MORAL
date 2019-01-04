@@ -23,15 +23,15 @@ module Moral
     end
 
     def initialize(type: 'node',
-      active: true,
-      routing: 'm',
-      weight: 1,
-      address: nil,
-      port: nil,
-      balancer: nil,
-      name: nil,
-      health_check: nil,
-      payload: nil)
+                   active: true,
+                   routing: 'm',
+                   weight: 1,
+                   address: nil,
+                   port: nil,
+                   balancer: nil,
+                   name: nil,
+                   health_check: nil,
+                   payload: nil)
 
       @type = type
       @active = active

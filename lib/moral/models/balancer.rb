@@ -8,11 +8,11 @@ module Moral
     attr_accessor :active
 
     def initialize(protocol: 'TCP',
-      scheduler: 'rr',
-      active: true,
-      address: nil,
-      port: nil,
-      name: nil)
+                   scheduler: 'rr',
+                   active: true,
+                   address: nil,
+                   port: nil,
+                   name: nil)
       @protocol = protocol
       @scheduler = scheduler
       @address = address
@@ -22,7 +22,7 @@ module Moral
 
       @active = true if @active.nil?
 
-      # FIXME default values, random
+      # FIXME: default values, random
       @nodes = []
     end
 
@@ -59,7 +59,7 @@ module Moral
     end
 
     def create!
-      # FIXME check existance
+      # FIXME: check existance
       Moral::Misc.command("ipvsadm -A -t #{service_address}  -s #{@scheduler}")
       @nodes.each do |node|
         next unless node.active && node.alive

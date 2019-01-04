@@ -102,7 +102,7 @@ module Moral
               server[headers[2][x]] = packets[x]
             end
             cl = Moral::Node
-            # FIXME - change cl, if node is docker
+            # FIXME: - change cl, if node is docker
             addr = server['RemoteAddress:Port'].split(':')
             r = 'm'
             case server['Forward']

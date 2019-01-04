@@ -11,13 +11,13 @@ module Moral
     attr_accessor :node
 
     def self.factory(type: 'tcp',
-      interval: 10,
-      dead_on: 1,
-      back_on: 1,
-      definition: nil,
-      node: nil)
+                     interval: 10,
+                     dead_on: 1,
+                     back_on: 1,
+                     definition: nil,
+                     node: nil)
 
-      # FIXME if type is http, return instance of HTTP
+      # FIXME: if type is http, return instance of HTTP
       cl = self
       cl = Moral::ShellHealthCheck if type == 'shell'
 
@@ -40,11 +40,11 @@ module Moral
   end
 
     def initialize(type: 'tcp',
-      interval: 10.seconds,
-      dead_on: 1,
-      back_on: 1,
-      definition: nil,
-      node: nil)
+                   interval: 10.seconds,
+                   dead_on: 1,
+                   back_on: 1,
+                   definition: nil,
+                   node: nil)
 
       @type = type
       @interval = interval

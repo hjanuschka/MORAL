@@ -14,8 +14,7 @@ module Moral
       yield(stdout_str, status)
     end
 
-
-    def self.command_block(command, env = nil)
+    def self.command_block(command, _env = nil)
       puts "Running command: #{command}"
       stdout_str, status = Open3.capture2("#{command} 2>&1")
       yield(stdout_str, status)
