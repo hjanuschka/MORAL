@@ -53,6 +53,12 @@ module Moral
       @nodes.each(&:remove_gone!)
     end
 
+    def delete_node_at(index)
+      @nodes.each_with_index do | n, index |
+          next unless n.type == 'node'
+          @nodes.delete_at(index)
+      end
+    end
     def remove!
       @nodes.each(&:remove!)
       Moral::Misc.command("ipvsadm -D -t #{service_address}")

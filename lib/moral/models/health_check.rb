@@ -10,6 +10,8 @@ module Moral
     attr_accessor :interval
     attr_accessor :dead_on
     attr_accessor :node
+    attr_accessor :type
+    attr_accessor :definition
 
     def self.factory(type: 'tcp',
                      interval: 10,
