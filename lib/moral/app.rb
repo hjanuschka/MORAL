@@ -1,10 +1,23 @@
+require 'logger'
 module Moral
   class App
     def initialize
       @threads = []
     end
 
+    def self.logger
+      return @logger if @logger
+      @logger = Logger.new(STDOUT)
+      @logger.level = Logger::DEBUG # FIXME log level by config
+      @logger
+    end
     def run!
+      trap "SIGINT" do
+        Moral::App.logger.debug "SIGINT"
+        @threads.each(&:kill)
+        exit 130
+      end
+
       @ipvs = Moral::IPVS.new
       @ipvs.update_table
       # start threads
@@ -16,7 +29,8 @@ module Moral
       end
 
       @docker = Thread.new do
-        puts 'FIXME DOCKER'
+        Moral::App.logger.debug("FIXME: docker thread")
+        Moral::App.logger.debug 'FIXME DOCKER'
       end
 
       @sinatra = Thread.new do
@@ -29,7 +43,8 @@ module Moral
 
       # wait for all threads
       @threads.each(&:join)
-      puts 'END'
+
+     Moral::App.logger.debug 'END'
     end
   end
 end

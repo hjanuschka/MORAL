@@ -1,14 +1,14 @@
 module Moral
   class DockerNode < Node
     def update!
-      puts 'DOCKER UPDATE'
+      Moral::App.logger.debug 'DOCKER UPDATE'
     end
 
     def create!
       # FIXME
       binding.pry
       @docker_nodes ||= []
-      puts 'DOCKER CREATE'
+      Moral::App.logger.debug 'DOCKER CREATE'
       # create multiple nodes
       n = Node.new(name: 'ha1', address: '127.0.0.2', port: 811, health_check: @health_check, balancer: @balancer)
       @docker_nodes << n
@@ -20,7 +20,7 @@ module Moral
     end
 
     def remove_gone!
-      puts 'DOCKER check if i got removed'
+      Moral::App.logger.debug 'DOCKER check if i got removed'
       # @docker_nodes.map(&:remove!)
     end
 
@@ -31,7 +31,7 @@ module Moral
     end
 
     def remove!
-      puts 'DOCKER REMOVE'
+      Moral::App.logger.debug 'DOCKER REMOVE'
     end
   end
 end

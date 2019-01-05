@@ -5,6 +5,8 @@ require 'moral/models/balancer'
 require 'moral/models/node'
 require 'moral/models/docker_node'
 require 'moral/models/health_check'
+
+require 'moral/models/health_checks/http'
 require 'moral/models/health_checks/shell'
 
 require 'moral/config'

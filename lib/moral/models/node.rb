@@ -54,7 +54,7 @@ module Moral
     end
 
     def remove_gone!
-      # puts "check if i got removed #{server_address}"
+      # Moral::App.logger.debug "check if i got removed #{server_address}"
     end
 
     def remove!

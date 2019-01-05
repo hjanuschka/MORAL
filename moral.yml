@@ -14,10 +14,10 @@ balancers:
         # i = ipip (tunneling)
         routing: m
         weight: 1
-        address: 192.168.239.1
-        port: 80
+        address: 192.168.0.171
+        port: 8080
         health:
-          interval: 10s
+          interval: 10
           dead_on: 1
           back_on: 1
           type: tcp
@@ -28,18 +28,22 @@ balancers:
         type: node
         routing: m
         weight: 1
-        address: 192.168.239.2
-        port: 80
+        address: www.krone.at
+        port: 443
         health:
           type: http
-          interval: 10s
+          interval: 2
           dead_on: 1
           back_on: 1
           definition:
-            endpoint: /v1/health
+            protocol: https
+            endpoint: /nachrichten
+            headers:
+              Host: "www.krone.at"
+              custom: "custom"
             timeout: 2
             expectet:
-              content: "some string"
+              content: "achrichten"
               status: 200
       docker_container:
         type: docker
@@ -51,7 +55,7 @@ balancers:
           dynamic: true
         health:
           type: http
-          interval: 10s
+          interval: 10
           dead_on: 1
           back_on: 1
           definition:
@@ -80,7 +84,7 @@ balancers:
         port: 81
         health:
           window:
-            interval: 10s
+            interval: 10
             dead_on: 1
             back_on: 1
           type: tcp

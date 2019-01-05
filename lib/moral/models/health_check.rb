@@ -1,3 +1,4 @@
+
 module Moral
   class HealthCheck < BaseModel
     attr_accessor :state
@@ -20,6 +21,7 @@ module Moral
       # FIXME: if type is http, return instance of HTTP
       cl = self
       cl = Moral::ShellHealthCheck if type == 'shell'
+      cl = Moral::HttpHealthCheck if type == 'http'
 
       cl.new(type: type, interval: interval, dead_on: dead_on, back_on: back_on, definition: definition, node: node)
    end
