@@ -7,7 +7,7 @@ module Moral
     get '/balancers' do
       r = []
       settings.cfg.balancers.each do | b |
-        r << {name: b.name, service_address: b.service_address, address: b.address, port: b.port, protocol: b.protocol, scheduler: b.scheduler, active: b.active }
+        r << b.to_h
       end
       json r
     end
@@ -15,7 +15,7 @@ module Moral
       r = nil
       settings.cfg.balancers.each do | b |
         next unless b.name == params[:name]
-        r = {name: b.name, service_address: b.service_address, address: b.address, port: b.port, protocol: b.protocol, scheduler: b.scheduler, active: b.active }
+        r = b.to_h
       end
       json r
     end
@@ -26,7 +26,7 @@ module Moral
       settings.cfg.balancers.each do | b |
         next unless b.name == params[:name]
         b.nodes.each do | n |
-          r << {name: n.name, address: n.address, routing: n.routing, weight: n.weight, port: n.port, server_address: n.server_address, type: n.type, health: {type: n.health_check.type, dead_on: n.health_check.dead_on, back_on: n.health_check.back_on, definition: n.health_check.definition, state: n.health_check.state, last_check: n.health_check.last_check}}
+          r << n.to_h
         end
       end
       json r
@@ -39,7 +39,7 @@ module Moral
         next unless b.name == params[:name]
         b.nodes.each do | n |
           next unless n.name == params[:node_name]
-          r = {name: n.name, address: n.address, routing: n.routing, weight: n.weight, port: n.port, server_address: n.server_address, type: n.type, health: {type: n.health_check.type, dead_on: n.health_check.dead_on, back_on: n.health_check.back_on, definition: n.health_check.definition, state: n.health_check.state, last_check: n.health_check.last_check}}
+          r = n.to_h
         end
       end
       json r
@@ -59,9 +59,7 @@ module Moral
           settings.cfg.balancers << balancer
           settings.ipvs.update_table
       end
-      b = balancer
-        r = {name: b.name, service_address: b.service_address, address: b.address, port: b.port, protocol: b.protocol, scheduler: b.scheduler, active: b.active }
-      json  r
+      json  balancer.to_h
 
     end
 
@@ -103,9 +101,7 @@ module Moral
           settings.ipvs.update_table
         end
 
-        n = node
-        r = {name: n.name, address: n.address, routing: n.routing, weight: n.weight, port: n.port, server_address: n.server_address, type: n.type, health: {type: n.health_check.type, dead_on: n.health_check.dead_on, back_on: n.health_check.back_on, definition: n.health_check.definition, state: n.health_check.state, last_check: n.health_check.last_check}}
-      json r
+        json node.to_h
     end
 
     delete '/balancer/:name' do

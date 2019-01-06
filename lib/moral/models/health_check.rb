@@ -42,6 +42,20 @@ module Moral
   rescue StandardError => x
     :bad
   end
+    def to_h
+      h = {
+        type: @type,
+        interval: @interval,
+        dead_on: @dead_on,
+        back_on: @back_on,
+        definition: @definition,
+        node: @node.name,
+        state: @state,
+        last_state: @last_state,
+        last_check: @last_check,
+        retain_count: @retain_count
+      }
+    end
 
     def initialize(type: 'tcp',
                    interval: 10.seconds,

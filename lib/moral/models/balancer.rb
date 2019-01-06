@@ -26,6 +26,21 @@ module Moral
       @nodes = []
     end
 
+    def to_h
+        h = {
+             protocol: @protocol,
+             scheduler: @scheduler,
+             address: @address,
+             port: @port,
+             name: @name,
+             active: @active,
+             nodes: []
+            }
+        nodes.each do | n |
+          h[:nodes] << n.to_h
+        end
+        h
+    end
     def nodes
       fin = []
       @nodes.each do |no|

@@ -22,6 +22,21 @@ module Moral
       update!
     end
 
+    def to_h
+      h = {
+            type: @type,
+            active: @active,
+            routing: @routing,
+            weight: @weight,
+            address: @address,
+            port: @port,
+            name: @name,
+            payload: @payload,
+            health_check: @health_check.to_h,
+            alive: @alive,
+            balancer: @balancer.name
+          }
+    end
     def initialize(type: 'node',
                    active: true,
                    routing: 'm',
