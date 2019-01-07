@@ -17,7 +17,6 @@ module Moral
 
     def service?(address: nil, port: nil)
       @balancers.each do |balancer|
-        binding.pry
         return balancer if balancer.address == address && balancer.port == port
       end
       nil
