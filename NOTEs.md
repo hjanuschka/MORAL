@@ -1,3 +1,15 @@
+TODO:
+  - [  ] finish rspec
+  - [  ] implement health check events
+  - [  ] implement heartbeat
+    - [  ] own thread
+      - [  ] execute check
+       - [  ]execute events
+       - [  ] transfer role automatically - via rest
+       - [  ] cli command to manually transition role
+       - [  ] add routes to manage role
+
+
 ###### MorAl
 Optix for CLI grouping
 sinatra web server

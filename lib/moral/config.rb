@@ -9,7 +9,7 @@ module Moral
 
     def initialize
       ENV['MORAL_CONFIG'] ||= 'moral.yml'
-      @config = YAML.load_file(ENV['MORAL_CONFIG'])
+      @config = YAML.load(File.read(ENV['MORAL_CONFIG']))
       @balancers = []
       load_balancers
       load_nodes
@@ -41,7 +41,7 @@ module Moral
           # FIXME: - change cl, if node is docker
           node = Object.const_get(cl.to_s).new(name: name,
                                           routing: node_config.routing,
-                                          weight: node_config.weight,
+                                         weight: node_config.weight,
                                           active:  node_config.active,
                                           address: node_config.address,
                                           port: node_config.port,

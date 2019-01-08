@@ -11,9 +11,9 @@ heartbeat:
   type: http
   events:
     rise:
-      shell: "ifconfig eth0:0 127.0.0.2"
+      - shell: "ifconfig eth0:0 127.0.0.2"
     fall:
-      shell: "ifconfig eth0:0 down"
+      - shell: "ifconfig eth0:0 down"
   definition:
     endpoint: http://${MORAL_SLAVE}
     timeout: 2
@@ -23,17 +23,18 @@ heartbeat:
       content: "GOOD"
       status: 200
 
+
 balancers:
   balancer1:
-    events:
-      rise:
-        - shell: "echo good"
-      fall:
-        - shell: "baad"
     protocol: TCP
     scheduler: rr
     address: 192.168.239.6
     port: 8080
+    events:
+      rise:
+        - shell: "echo good"
+      fall:
+        - shell: "baad zero nodes"
     nodes:
       alisa:
         active: true
@@ -59,6 +60,7 @@ balancers:
               - exit: 1
             rise:
               - shell: "curl.... i am here"
+
           interval: 10
           dead_on: 1
           back_on: 1
@@ -84,7 +86,7 @@ balancers:
               Host: "www.krone.at"
               custom: "custom"
             timeout: 2
-            expected:
+            expectet:
               content: "achrichten"
               status: 200
       docker_container:
@@ -107,31 +109,6 @@ balancers:
               content: "some string"
               status: 200
 
-
-  balancer2:
-    protocol: TCP
-    active: true
-    scheduler: rr
-    address: 192.168.239.6
-    port: 8081
-    nodes:
-      alisa:
-        type: node
-        # g = direct routing (gatwaying)
-        # m = masquerading
-        # i = ipip (tunneling)
-        routing: m
-        weight: 1
-        address: 192.168.239.1
-        port: 81
-        health:
-          window:
-            interval: 10
-            dead_on: 1
-            back_on: 1
-          type: tcp
-          definition:
-            timeout: 2
 
 
 
