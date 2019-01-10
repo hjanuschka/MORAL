@@ -25,11 +25,11 @@ heartbeat:
 
 balancers:
   balancer1:
-    events:
-      rise:
-        - shell: "echo good"
-      fall:
-        - shell: "baad"
+#    events:
+#      rise:
+#        - shell: "echo good"
+#      fall:
+#        - shell: "baad"
     protocol: TCP
     scheduler: rr
     address: 192.168.239.6
@@ -53,12 +53,13 @@ balancers:
                   if cfg.balances.find().nodes.length <= 0
                     all nodes dead exit
                   end
-              - shell: "echo i died"
-              - shell: "curl .... notify someone"
-              - clear: all
-              - exit: 1
+              - shell: "echo died"
+              - shell: "curl localhost"
+              #- clear: all (all|balancer|node)
+              #- clear: node
+              #- exit: 1 # exit all threads
             rise:
-              - shell: "curl.... i am here"
+              - shell: "echo alive"
           interval: 10
           dead_on: 1
           back_on: 1

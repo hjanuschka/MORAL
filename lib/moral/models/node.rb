@@ -13,11 +13,13 @@ module Moral
     attr_accessor :balancer
 
     def fall!
+      @health_check.events.fall!
       @weight = 0
       update!
     end
 
     def rise!
+      @health_check.events.rise!
       @weight = @config_weight
       update!
     end
@@ -74,6 +76,7 @@ module Moral
 
     def remove!
       Moral::Misc.command("ipvsadm -d -t #{@balancer.service_address} -r #{server_address}")
+      @balancer.remove_node!(self)
     end
 
     def update!

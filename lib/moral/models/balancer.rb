@@ -53,6 +53,9 @@ module Moral
       # FIXME
     end
 
+    def remove_node!(node)
+      @nodes.delete(node)
+    end
     def node?(address: nil, port: nil)
       @nodes.each do |node|
         return node if node.address == address && node.port = port
@@ -77,6 +80,7 @@ module Moral
     def remove!
       @nodes.each(&:remove!)
       Moral::Misc.command("ipvsadm -D -t #{service_address}")
+      Moral::Config.instance.balancers.delete(self)
     end
 
     def create!

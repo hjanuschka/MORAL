@@ -28,12 +28,20 @@ module Moral
         nodes.each_pair do |name, options|
           node_config = OpenStruct.new(options)
           health_config = OpenStruct.new(node_config.health)
+          event_config = OpenStruct.new(health_config.events)
+
+          events = Moral::HealthChecks::Events.new(
+            rise: event_config.rise,
+            fall: event_config.fall
+          )
+
           health = Moral::HealthCheck.factory(
             type: health_config.type,
             interval: health_config.interval.to_i,
             dead_on: health_config.dead_on,
             back_on: health_config.back_on,
-            definition: health_config.definition
+            definition: health_config.definition,
+            events: events
           )
 
           cl = Moral::Node
@@ -50,6 +58,7 @@ module Moral
                                           payload: node_config.payload || nil)
 
           health.node = node
+          health.events.node = node
           balancer.add_node(node: node)
         end
       end

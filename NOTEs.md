@@ -1,6 +1,7 @@
 TODO:
   - [  ] finish rspec
-  - [  ] implement health check events
+  - [  ] add udp health check
+  - [x] implement health check events
   - [  ] implement heartbeat
     - [  ] own thread
       - [  ] execute check
@@ -9,7 +10,7 @@ TODO:
        - [  ] cli command to manually transition role
        - [  ] add routes to manage role
 
-
+  - [  ] refactor health checks to go into own module Moral::HealthChecks::Shell ....
 ###### MorAl
 Optix for CLI grouping
 sinatra web server

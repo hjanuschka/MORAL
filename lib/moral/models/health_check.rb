@@ -12,20 +12,22 @@ module Moral
     attr_accessor :node
     attr_accessor :type
     attr_accessor :definition
+    attr_accessor :events
 
     def self.factory(type: 'tcp',
                      interval: 10,
                      dead_on: 1,
                      back_on: 1,
                      definition: nil,
-                     node: nil)
+                     node: nil,
+                     events: nil)
 
       # FIXME: if type is http, return instance of HTTP
       cl = self
       cl = Moral::ShellHealthCheck if type == 'shell'
       cl = Moral::HttpHealthCheck if type == 'http'
 
-      cl.new(type: type, interval: interval, dead_on: dead_on, back_on: back_on, definition: definition, node: node)
+      cl.new(type: type, interval: interval, dead_on: dead_on, back_on: back_on, definition: definition, node: node, events: events)
    end
 
     def run!
@@ -53,7 +55,8 @@ module Moral
         state: @state,
         last_state: @last_state,
         last_check: @last_check,
-        retain_count: @retain_count
+        retain_count: @retain_count,
+        events: @events
       }
     end
 
@@ -62,7 +65,8 @@ module Moral
                    dead_on: 1,
                    back_on: 1,
                    definition: nil,
-                   node: nil)
+                   node: nil,
+                   events: nil)
 
       @type = type
       @interval = interval
@@ -75,6 +79,7 @@ module Moral
       @last_check = 0
       @state_changed = false
       @retain_count = 0
+      @events = events
     end
   end
 end

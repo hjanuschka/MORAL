@@ -8,6 +8,7 @@ require 'moral/models/health_check'
 
 require 'moral/models/health_checks/http'
 require 'moral/models/health_checks/shell'
+require 'moral/models/health_checks/events'
 
 require 'moral/config'
 

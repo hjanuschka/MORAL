@@ -115,7 +115,7 @@ module Moral
           end
         end
         b.remove!
-        settings.cfg.balancers.delete_at(idx)
+
         json true
       end
     end
@@ -134,7 +134,6 @@ module Moral
         b.nodes.each_with_index do | node, index |
             if node.name == params[:node_name]
                 node.remove!
-                b.delete_node_at(index)
             end
         end
         json true
