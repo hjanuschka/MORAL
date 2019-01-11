@@ -18,8 +18,41 @@ module Moral
         exit 130
       end
 
-      @ipvs = Moral::IPVS.new
-      @ipvs.update_table
+      # Check Cluster state
+
+      @cfg = Moral::Config.instance
+      if @cfg.heartbeat_config.enabled
+        @cfg.heartbeat_nodes.each do | n |
+          next if n.name == @cfg.heartbeat_config.me
+          other_status = n.health_check.run!
+          begin
+            current_master = RestClient.get("http://#{n.name}:#{n.port}/master")
+          rescue => ex
+            current_master = nil
+          end
+          
+          if (current_master == nil or other_status == :bad) 
+            if (current_master != @cfg.heartbeat_config.me && @cfg.heartbeat_config.me == @cfg.heartbeat_config.primary)
+            puts "TAKEOVER1"
+              @cfg.stepup
+            puts "TAKEOVER2"
+            else
+              puts "STEPDOWN"
+              @cfg.die
+            end
+          else 
+              @cfg.die
+          end
+
+        end
+      else
+        @ipvs = Moral::IPVS.new
+        @ipvs.update_table
+      end
+
+
+
+
       # start threads
       #
 
@@ -34,7 +67,7 @@ module Moral
       end
 
       @sinatra = Thread.new do
-        #api = Moral::RestAPI.go(@mutex, @ipvs)
+        api = Moral::RestAPI.go(@mutex, @ipvs)
       end
 
       @heartbeat = Thread.new do

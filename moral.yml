@@ -1,27 +1,33 @@
 type: ipvs
 heartbeat:
-  primary: "ipvs1"
+  enabled: true
+  primary: "balancer1"
   me: ${MORAL_HOSTNAME}
   hosts:
-    - ipvs1
-    - ipvs2
-  rise: 1
-  fall: 1
-  interval: 1
-  type: http
-  events:
-    rise:
-      shell: "ifconfig eth0:0 127.0.0.2"
-    fall:
-      shell: "ifconfig eth0:0 down"
-  definition:
-    endpoint: http://${MORAL_SLAVE}
-    timeout: 2
-    headers:
-      Host: "www.krone.at"
-    expected:
-      content: "GOOD"
-      status: 200
+    - address: balancer1
+      port: 8088
+      name: balancer1
+    - address: balancer2
+      port: 8088
+      name: balancer2
+  health:
+    rise: 1
+    fall: 1
+    interval: 1
+    type: http_heartbeat
+    events:
+      rise:
+        shell: "echo rise"
+      fall:
+        shell: "echo fall"
+    definition:
+      endpoint: /health
+      timeout: 2
+      headers:
+        Host: "www.krone.at"
+      expected:
+        content: "GOOD"
+        status: 200
 
 balancers:
   balancer1:

@@ -3,12 +3,32 @@ module Moral
     attr_accessor :balancers
     attr_accessor :heartbeat_nodes
     attr_accessor :heartbeat_config
+    attr_accessor :heartbeat_master
 
     def self.instance
       @cfg_instance ||= new
       @cfg_instance
     end
 
+    def die
+      ipvs = Moral::IPVS.new
+      ipvs.clear_table
+      @balancers = []
+      @heartbeat_master = @heartbeat_nodes.first.name
+    end
+    def stepup
+
+      @heartbeat_master = @heartbeat_config.me
+      puts "ROLE TRANSFERED"
+      begin
+      @heartbeat_nodes.each do | n |
+        RestClient.delete("http://#{n.address}:#{n.port}/die")
+      end
+      rescue => ex
+      end
+      ipvs = Moral::IPVS.new
+      ipvs.update_table
+    end
     def initialize
       ENV['MORAL_CONFIG'] ||= 'moral.yml'
       @config = YAML.load(File.read(ENV['MORAL_CONFIG']))
@@ -33,7 +53,7 @@ module Moral
       @heartbeat_config.me.gsub!("${MORAL_HOSTNAME}", ENV['MORAL_HOSTNAME'])
       @heartbeat_nodes = []
       heartbeat_config.hosts.each_with_index do | n, i |
-        
+        next if n['name'] == heartbeat_config.me
         event_config = OpenStruct.new(heartbeat_config.events)
         health_config = OpenStruct.new(heartbeat_config.health)
 
@@ -62,7 +82,6 @@ module Moral
 
         @heartbeat_nodes << node
       end
-      binding.pry
     end
     def load_nodes
       @balancers.each do |balancer|

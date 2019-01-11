@@ -21,6 +21,12 @@ module Moral
     end
 
 
+    get '/master' do
+      settings.cfg.heartbeat_master
+    end
+    get '/health' do
+      "OK"
+    end
     get '/balancers/:name/nodes' do
       r = []
       settings.cfg.balancers.each do | b |
@@ -32,6 +38,9 @@ module Moral
       json r
     end
 
+    delete '/die' do
+      settings.cfg.die()
+    end
 
     get '/balancers/:name/nodes/:node_name' do
       r = nil

@@ -36,12 +36,26 @@ module Moral
               # FIXME all is good takeover
               Moral::App.logger.debug("HEARTBEAT: GOOD")
               # takeover, and takedown other
+              if Moral::Config.instance.heartbeat_master == Moral::Config.instance.heartbeat_config.me
+                  # everything is fine, we are master and other one is alive
+              else
+                # other node is alive, we are not master takeover
+                if Moral::Config.instance.heartbeat_config.primary == Moral::Config.instance.heartbeat_config.me
+                  Moral::Config.instance.stepup()
+                end
+              end
             end
 
             if c.last_state == :bad && c.retain_count == c.back_on && c.state_changed
               # FIXME failed
               # self-destruct + handover
               Moral::App.logger.debug("HEARTBEAT: fail!")
+              # other node is dead
+              # i am not master, i should not be, but i have to -> takeover
+              cfg = Moral::Config.instance.heartbeat_config
+                if cfg.heartbeat_master != cfg.me
+                  Moral::Config.instance.stepup 
+                end
             end
           end
         end

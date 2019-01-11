@@ -1,8 +1,18 @@
 version: "3.2"
 services:
-  balancer:
+  balancer1:
     privileged: true
     build: .
+    environment:
+      MORAL_HOSTNAME: balancer1
+    volumes:
+      - .:/src
+
+  balancer2:
+    privileged: true
+    build: .
+    environment:
+      MORAL_HOSTNAME: balancer2
     volumes:
       - .:/src
 
