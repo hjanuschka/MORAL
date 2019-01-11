@@ -7,14 +7,20 @@ module Moral
 
     def self.logger
       return @logger if @logger
+
       @logger = Logger.new(STDOUT)
-      @logger.level = Logger::DEBUG # FIXME log level by config
+      @logger.level = Logger::DEBUG # FIXME: log level by config
       @logger
     end
+
     def run!
-      trap "SIGINT" do
-        Moral::App.logger.debug "SIGINT"
-        @threads.each(&:kill)
+      Signal.trap("INT") do
+        Thread.new do
+          Moral::App.logger.debug "SIGINT"
+          Moral::Config.instance.balancers.each(&:remove!)
+          Moral::Config.instance.die
+          @threads.each(&:kill)
+        end.join
         exit 130
       end
 
@@ -22,15 +28,16 @@ module Moral
 
       @cfg = Moral::Config.instance
       if @cfg.heartbeat_config.enabled
-        @cfg.heartbeat_nodes.each do | n |
+        @cfg.heartbeat_nodes.each do |n|
           next if n.name == @cfg.heartbeat_config.me
+
           other_status = n.health_check.run!
           begin
             current_master = RestClient.get("http://#{n.name}:#{n.port}/master")
-          rescue => ex
+          rescue StandardError => ex
             current_master = "fail"
           end
-          
+
           hc = @cfg.heartbeat_config
           if hc.me == hc.primary
             # i should  be master
@@ -44,9 +51,6 @@ module Moral
         @ipvs = Moral::IPVS.new
         @ipvs.update_table
       end
-
-
-
 
       # start threads
       #
@@ -76,7 +80,7 @@ module Moral
       # wait for all threads
       @threads.each(&:join)
 
-     Moral::App.logger.debug 'END'
+      Moral::App.logger.debug 'END'
     end
   end
 end

@@ -18,6 +18,7 @@ module Moral
           c = node.health_check
           last_run_diff = (Time.now - c.last_check).to_i
           next if last_run_diff.to_i < c.interval.to_i
+
           status =  c.run!
           @mutex.synchronize do
             c.state = status

@@ -16,27 +16,27 @@ module Moral
       @balancers = []
       @heartbeat_master = @heartbeat_nodes.first.name
     end
-    def stepup
 
+    def stepup
       @heartbeat_master = @heartbeat_config.me
       puts "ROLE TRANSFERED"
       begin
-      @heartbeat_nodes.each do | n |
-        RestClient.delete("http://#{n.address}:#{n.port}/die")
-      end
-      rescue => ex
+        @heartbeat_nodes.each do |n |
+          RestClient.delete("http://#{n.address}:#{n.port}/die")
+        end
+      rescue StandardError => ex
       end
       ipvs = Moral::IPVS.new
-
 
       load_heartbeat
       load_balancers
       load_nodes
       ipvs.update_table
     end
+
     def initialize
       ENV['MORAL_CONFIG'] ||= 'moral.yml'
-      @config = YAML.load(File.read(ENV['MORAL_CONFIG']))
+      @config = YAML.safe_load(File.read(ENV['MORAL_CONFIG']))
       @balancers = []
       load_heartbeat
       load_balancers
@@ -57,37 +57,36 @@ module Moral
       @heartbeat_config = OpenStruct.new(@config['heartbeat'])
       @heartbeat_config.me.gsub!("${MORAL_HOSTNAME}", ENV['MORAL_HOSTNAME'])
       @heartbeat_nodes = []
-      heartbeat_config.hosts.each_with_index do | n, i |
+      heartbeat_config.hosts.each_with_index do |n, i|
         next if n['name'] == heartbeat_config.me
-        event_config = OpenStruct.new(heartbeat_config.events)
+
         health_config = OpenStruct.new(heartbeat_config.health)
+        event_config = OpenStruct.new(health_config.events)
 
         events = Moral::HealthChecks::Events.new(
-            rise: event_config.rise,
-            fall: event_config.fall
-          )
+          rise: event_config.rise,
+          fall: event_config.fall
+        )
         health = Moral::HealthCheck.factory(
-            type: health_config.type,
-            interval: health_config.interval.to_i,
-            dead_on: health_config.dead_on,
-            back_on: health_config.back_on,
-            definition: health_config.definition,
-            events: events
+          type: health_config.type,
+          interval: health_config.interval.to_i,
+          dead_on: health_config.dead_on,
+          back_on: health_config.back_on,
+          definition: health_config.definition,
+          events: events
         )
         node = Moral::Node.new(name: n['name'],
                                address: n['address'],
                                port: n['port'],
                                health_check: health)
 
-
-
         health.node = node
         health.events.node = node
-
 
         @heartbeat_nodes << node
       end
     end
+
     def load_nodes
       @balancers.each do |balancer|
         nodes = @config['balancers'][balancer.name]['nodes']
@@ -112,6 +111,7 @@ module Moral
 
           cl = Moral::Node
           next if node_config.type == 'docker'
+
           # FIXME: - change cl, if node is docker
           node = Object.const_get(cl.to_s).new(name: name,
                                           routing: node_config.routing,

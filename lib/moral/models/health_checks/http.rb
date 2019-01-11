@@ -14,7 +14,7 @@ module Moral
           return :bad
         end
         return :good
-      rescue => x
+      rescue StandardError => x
         return :bad
       end
     end

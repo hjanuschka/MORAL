@@ -39,6 +39,7 @@ module Moral
             balancer: @balancer.name
           }
     end
+
     def initialize(type: 'node',
                    active: true,
                    routing: 'm',

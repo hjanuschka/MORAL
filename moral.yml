@@ -17,25 +17,19 @@ heartbeat:
     type: http_heartbeat
     events:
       rise:
-        shell: "echo rise"
+        - shell: "ifconfig eth0:0 192.168.239.7 up"
       fall:
-        shell: "echo fall"
+        - shell: "ifconfig eth0:0 down"
     definition:
       endpoint: /health
       timeout: 2
       headers:
         Host: "www.krone.at"
       expected:
-        content: "GOOD"
         status: 200
 
 balancers:
   balancer1:
-#    events:
-#      rise:
-#        - shell: "echo good"
-#      fall:
-#        - shell: "baad"
     protocol: TCP
     scheduler: rr
     address: 192.168.239.6
@@ -44,9 +38,6 @@ balancers:
       alisa:
         active: true
         type: node
-        # g = direct routing (gatwaying)
-        # m = masquerading
-        # i = ipip (tunneling)
         routing: m
         weight: 1
         address: 192.168.0.171

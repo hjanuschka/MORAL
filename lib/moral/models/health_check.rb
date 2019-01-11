@@ -1,4 +1,3 @@
-
 module Moral
   class HealthCheck < BaseModel
     attr_accessor :state
@@ -41,9 +40,10 @@ module Moral
       end
 
       :good
-  rescue StandardError => x
-    :bad
+    rescue StandardError => x
+      :bad
   end
+
     def to_h
       h = {
         type: @type,

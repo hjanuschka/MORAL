@@ -5,7 +5,7 @@ require 'bundler/setup'
 require 'moral'
 
 module MoralGlobals
-    extend RSpec::SharedContext
+  extend RSpec::SharedContext
 end
 
 RSpec.configure do |config|

@@ -1,4 +1,3 @@
-
 module Moral
   require 'sinatra/base'
   require "sinatra/json"
@@ -6,20 +5,20 @@ module Moral
   class RestAPI < Sinatra::Base
     get '/balancers' do
       r = []
-      settings.cfg.balancers.each do | b |
+      settings.cfg.balancers.each do |b|
         r << b.to_h
       end
       json r
     end
     get '/balancers/:name' do
       r = nil
-      settings.cfg.balancers.each do | b |
+      settings.cfg.balancers.each do |b|
         next unless b.name == params[:name]
+
         r = b.to_h
       end
       json r
     end
-
 
     get '/master' do
       settings.cfg.heartbeat_master
@@ -29,9 +28,10 @@ module Moral
     end
     get '/balancers/:name/nodes' do
       r = []
-      settings.cfg.balancers.each do | b |
+      settings.cfg.balancers.each do |b|
         next unless b.name == params[:name]
-        b.nodes.each do | n |
+
+        b.nodes.each do |n|
           r << n.to_h
         end
       end
@@ -39,15 +39,17 @@ module Moral
     end
 
     delete '/die' do
-      settings.cfg.die()
+      settings.cfg.die
     end
 
     get '/balancers/:name/nodes/:node_name' do
       r = nil
-      settings.cfg.balancers.each do | b |
+      settings.cfg.balancers.each do |b|
         next unless b.name == params[:name]
-        b.nodes.each do | n |
+
+        b.nodes.each do |n|
           next unless n.name == params[:node_name]
+
           r = n.to_h
         end
       end
@@ -65,11 +67,10 @@ module Moral
                                 port: payload['port'])
 
       settings.mutex.synchronize do
-          settings.cfg.balancers << balancer
-          settings.ipvs.update_table
+        settings.cfg.balancers << balancer
+        settings.ipvs.update_table
       end
-      json  balancer.to_h
-
+      json balancer.to_h
     end
 
     post '/balancers/:name/node' do
@@ -77,47 +78,48 @@ module Moral
       payload = params
       payload = JSON.parse(request.body.read) unless params[:path]
       b = nil
-      settings.cfg.balancers.each do | c |
+      settings.cfg.balancers.each do |c|
         next unless c.name == params[:name]
+
         b = c
         break
       end
 
-          health = Moral::HealthCheck.factory(
-            type: payload['health_check']['type'],
-            interval: payload['health_check']['interval'].to_i,
-            dead_on: payload['health_check']['dead_on'],
-            back_on: payload['health_check']['back_on'],
-            definition: payload['health_check']['definition']
-          )
+      health = Moral::HealthCheck.factory(
+        type: payload['health_check']['type'],
+        interval: payload['health_check']['interval'].to_i,
+        dead_on: payload['health_check']['dead_on'],
+        back_on: payload['health_check']['back_on'],
+        definition: payload['health_check']['definition']
+      )
 
-          cl = Moral::Node
-          # FIXME: - change cl, if node is docker
-          node = Object.const_get(cl.to_s).new(name: payload['name'],
-                                          routing: payload['routing'],
-                                          weight: payload['weight'],
-                                          active:  payload['active'],
-                                          address: payload['address'],
-                                          port: payload['port'],
-                                          health_check: health,
-                                          balancer: b,
-                                          payload: payload['payload'] || nil)
+      cl = Moral::Node
+      # FIXME: - change cl, if node is docker
+      node = Object.const_get(cl.to_s).new(name: payload['name'],
+                                      routing: payload['routing'],
+                                      weight: payload['weight'],
+                                      active:  payload['active'],
+                                      address: payload['address'],
+                                      port: payload['port'],
+                                      health_check: health,
+                                      balancer: b,
+                                      payload: payload['payload'] || nil)
 
-          health.node = node
+      health.node = node
 
-        settings.mutex.synchronize do
-          b.add_node(node: node)
-          settings.ipvs.update_table
-        end
+      settings.mutex.synchronize do
+        b.add_node(node: node)
+        settings.ipvs.update_table
+      end
 
-        json node.to_h
+      json node.to_h
     end
 
     delete '/balancer/:name' do
       settings.mutex.synchronize do
         idx = nil
         b = nil
-        settings.cfg.balancers.each_with_index do | balancer, index |
+        settings.cfg.balancers.each_with_index do |balancer, index|
           if balancer.name == params[:name]
             idx = index
             b = balancer
@@ -129,27 +131,24 @@ module Moral
       end
     end
 
-
     delete '/balancer/:name/node/:node_name' do
       settings.mutex.synchronize do
         idx = nil
         b = nil
-        settings.cfg.balancers.each_with_index do | balancer, index |
+        settings.cfg.balancers.each_with_index do |balancer, index|
           if balancer.name == params[:name]
             idx = index
             b = balancer
           end
         end
-        b.nodes.each_with_index do | node, index |
-            if node.name == params[:node_name]
-                node.remove!
-            end
+        b.nodes.each_with_index do |node, index|
+          if node.name == params[:node_name]
+            node.remove!
+          end
         end
         json true
       end
     end
-
-
 
     get '/' do
       Moral::Config.instance.balancers.to_json
