@@ -34,7 +34,11 @@ module Moral
       end
 
       @sinatra = Thread.new do
-        api = Moral::RestAPI.go(@mutex, @ipvs)
+        #api = Moral::RestAPI.go(@mutex, @ipvs)
+      end
+
+      @heartbeat = Thread.new do
+        Moral::HeartBeat.new(@mutex, @ipvs).run!
       end
 
       @threads << @watchdog

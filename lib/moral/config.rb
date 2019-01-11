@@ -1,6 +1,8 @@
 module Moral
   class Config
     attr_accessor :balancers
+    attr_accessor :heartbeat_nodes
+    attr_accessor :heartbeat_config
 
     def self.instance
       @cfg_instance ||= new
@@ -11,6 +13,7 @@ module Moral
       ENV['MORAL_CONFIG'] ||= 'moral.yml'
       @config = YAML.load(File.read(ENV['MORAL_CONFIG']))
       @balancers = []
+      load_heartbeat
       load_balancers
       load_nodes
     end
@@ -22,6 +25,45 @@ module Moral
       nil
     end
 
+    def load_heartbeat
+      # create health_check
+      # create healthcheck event
+      #
+      @heartbeat_config = OpenStruct.new(@config['heartbeat'])
+      @heartbeat_config.me.gsub!("${MORAL_HOSTNAME}", ENV['MORAL_HOSTNAME'])
+      @heartbeat_nodes = []
+      heartbeat_config.hosts.each_with_index do | n, i |
+        
+        event_config = OpenStruct.new(heartbeat_config.events)
+        health_config = OpenStruct.new(heartbeat_config.health)
+
+        events = Moral::HealthChecks::Events.new(
+            rise: event_config.rise,
+            fall: event_config.fall
+          )
+        health = Moral::HealthCheck.factory(
+            type: health_config.type,
+            interval: health_config.interval.to_i,
+            dead_on: health_config.dead_on,
+            back_on: health_config.back_on,
+            definition: health_config.definition,
+            events: events
+        )
+        node = Moral::Node.new(name: n['name'],
+                               address: n['address'],
+                               port: n['port'],
+                               health_check: health)
+
+
+
+        health.node = node
+        health.events.node = node
+
+
+        @heartbeat_nodes << node
+      end
+      binding.pry
+    end
     def load_nodes
       @balancers.each do |balancer|
         nodes = @config['balancers'][balancer.name]['nodes']

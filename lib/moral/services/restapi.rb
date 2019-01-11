@@ -146,7 +146,7 @@ module Moral
       Moral::Config.instance.balancers.to_json
     end
     def self.go(mutex, ipvs)
-      set :port, 8088
+      set :port, ENV['MORAL_REST_PORT'] || 8088
       set :bind, '0.0.0.0'
       set :public_folder, 'public'
       set :cfg, Moral::Config.instance

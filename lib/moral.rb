@@ -15,6 +15,7 @@ require 'moral/config'
 require 'moral/services/ipvs'
 require 'moral/services/watchdog'
 require 'moral/services/restapi'
+require 'moral/services/heartbeat'
 require 'moral/app'
 require 'moral/misc'
 
