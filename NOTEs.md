@@ -2,11 +2,11 @@ TODO:
   - [  ] finish rspec
   - [  ] add udp health check
   - [x] implement health check events
-  - [  ] implement heartbeat
-    - [  ] own thread
-      - [  ] execute check
+  - [x] implement heartbeat
+    - [x] own thread
+      - [x] execute check
        - [  ]execute events
-       - [  ] transfer role automatically - via rest
+       - [x] transfer role automatically - via rest
        - [  ] cli command to manually transition role
        - [  ] add routes to manage role
 

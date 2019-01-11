@@ -27,6 +27,11 @@ module Moral
       rescue => ex
       end
       ipvs = Moral::IPVS.new
+
+
+      load_heartbeat
+      load_balancers
+      load_nodes
       ipvs.update_table
     end
     def initialize

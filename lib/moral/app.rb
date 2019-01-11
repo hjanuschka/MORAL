@@ -28,22 +28,17 @@ module Moral
           begin
             current_master = RestClient.get("http://#{n.name}:#{n.port}/master")
           rescue => ex
-            current_master = nil
+            current_master = "fail"
           end
           
-          if (current_master == nil or other_status == :bad) 
-            if (current_master != @cfg.heartbeat_config.me && @cfg.heartbeat_config.me == @cfg.heartbeat_config.primary)
-            puts "TAKEOVER1"
-              @cfg.stepup
-            puts "TAKEOVER2"
-            else
-              puts "STEPDOWN"
-              @cfg.die
-            end
-          else 
-              @cfg.die
+          hc = @cfg.heartbeat_config
+          if hc.me == hc.primary
+            # i should  be master
+            @cfg.stepup
+          else
+            # i should not be master
+            @cfg.die
           end
-
         end
       else
         @ipvs = Moral::IPVS.new
