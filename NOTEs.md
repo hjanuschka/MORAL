@@ -1,6 +1,9 @@
 TODO:
   - [  ] finish rspec
   - [  ] add udp health check
+  - [  ] implement docker thread
+    - [  ] listen create/remove events, filter based on name
+    - [  ] add node, remove node's
   - [x] implement health check events
   - [x] implement heartbeat
     - [x] own thread
