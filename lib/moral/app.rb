@@ -37,13 +37,17 @@ module Moral
           rescue StandardError => ex
             current_master = "fail"
           end
-
+          puts "CURRENT MASTER: #{current_master} " 
           hc = @cfg.heartbeat_config
           if hc.me == hc.primary
-            # i should  be master
-            @cfg.stepup
+            if current_master != hc.me
+              puts "TAKE IT"
+              # i should  be master
+              @cfg.stepup
+            end
           else
             # i should not be master
+            puts "i am slave"
             @cfg.die
           end
         end
