@@ -74,7 +74,6 @@ module Moral
     end
 
     post '/balancers/:name/node' do
-      r = nil
       payload = params
       payload = JSON.parse(request.body.read) unless params[:path]
       b = nil

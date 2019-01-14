@@ -45,7 +45,7 @@ module Moral
           balancer.update!
           # remove gone nodes
           balancer.nodes.each do |node|
-            loaded_node = loaded_balancer.node?(address: node.address, port: node.port)
+            # loaded_node = loaded_balancer.node?(address: node.address, port: node.port)
             unless node.active && node.alive
               node.remove!
               next

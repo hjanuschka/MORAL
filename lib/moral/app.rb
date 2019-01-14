@@ -32,12 +32,15 @@ module Moral
           next if n.name == @cfg.heartbeat_config.me
 
           other_status = n.health_check.run!
+          if other_status == :bad
+            # opposite_failed = true
+          end
           begin
             current_master = RestClient.get("http://#{n.name}:#{n.port}/master")
-          rescue StandardError => ex
+          rescue StandardError
             current_master = "fail"
           end
-          puts "CURRENT MASTER: #{current_master} " 
+          puts "CURRENT MASTER: #{current_master} "
           hc = @cfg.heartbeat_config
           if hc.me == hc.primary
             if current_master != hc.me
@@ -70,7 +73,7 @@ module Moral
       end
 
       @sinatra = Thread.new do
-        api = Moral::RestAPI.go(@mutex, @ipvs)
+        Moral::RestAPI.go(@mutex, @ipvs)
       end
 
       @heartbeat = Thread.new do
