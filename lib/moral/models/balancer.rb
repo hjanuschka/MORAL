@@ -60,7 +60,7 @@ module Moral
 
     def node?(address: nil, port: nil)
       @nodes.each do |node|
-        return node if node.address == address && node.port = port
+        return node if node.address == address && node.port == port
       end
       nil
     end
@@ -74,10 +74,10 @@ module Moral
     end
 
     def delete_node_at(index)
-      @nodes.each_with_index do |n, index|
+      @nodes.each_with_index do |n, idx|
         next unless n.type == 'node'
 
-        @nodes.delete_at(index)
+        @nodes.delete_at(index) if index == idx
       end
     end
 

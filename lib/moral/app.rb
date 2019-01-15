@@ -46,18 +46,25 @@ end
           next if n.name == @cfg.heartbeat_config.me
 
           other_status = n.health_check.run!
+          if other_status == :bad
+            # opposite_failed = true
+          end
           begin
             current_master = RestClient.get("http://#{n.name}:#{n.port}/master")
-          rescue StandardError => ex
+          rescue StandardError
             current_master = "fail"
           end
-
+          puts "CURRENT MASTER: #{current_master} "
           hc = @cfg.heartbeat_config
           if hc.me == hc.primary
-            # i should  be master
-            @cfg.stepup
+            if current_master != hc.me
+              puts "TAKE IT"
+              # i should  be master
+              @cfg.stepup
+            end
           else
             # i should not be master
+            puts "i am slave"
             @cfg.die
           end
         end
@@ -95,7 +102,7 @@ log_table table
       end
 
       @sinatra = Thread.new do
-        api = Moral::RestAPI.go(@mutex, @ipvs)
+        Moral::RestAPI.go(@mutex, @ipvs)
       end
 
       @heartbeat = Thread.new do

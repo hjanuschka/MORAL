@@ -21,10 +21,11 @@ module Moral
       @heartbeat_master = @heartbeat_config.me
       puts "ROLE TRANSFERED"
       begin
-        @heartbeat_nodes.each do |n |
-          RestClient.delete("http://#{n.address}:#{n.port}/die")
+        @heartbeat_nodes.each do |node|
+          RestClient.delete("http://#{node.address}:#{node.port}/die")
         end
-      rescue StandardError => ex
+      rescue StandardError
+        # ign
       end
       ipvs = Moral::IPVS.new
 

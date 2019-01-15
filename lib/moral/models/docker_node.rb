@@ -1,12 +1,7 @@
 module Moral
   class DockerNode < Node
-    def update!
-      Moral::App.logger.debug 'DOCKER UPDATE'
-    end
-
     def create!
       # FIXME
-      binding.pry
       @docker_nodes ||= []
       Moral::App.logger.debug 'DOCKER CREATE'
       # create multiple nodes

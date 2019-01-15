@@ -27,7 +27,7 @@ module Moral
       cl = Moral::HttpHealthCheck if type == 'http'
 
       cl.new(type: type, interval: interval, dead_on: dead_on, back_on: back_on, definition: definition, node: node, events: events)
-   end
+    end
 
     def run!
       # Check if port is reachable
@@ -40,12 +40,12 @@ module Moral
       end
 
       :good
-    rescue StandardError => x
+    rescue StandardError
       :bad
-  end
+    end
 
     def to_h
-      h = {
+      {
         type: @type,
         interval: @interval,
         dead_on: @dead_on,
