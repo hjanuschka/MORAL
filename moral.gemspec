@@ -30,6 +30,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'rest-client'
   spec.add_dependency 'sinatra'
+  spec.add_dependency 'terminal-table'
   spec.add_dependency 'sinatra-contrib'
   spec.add_development_dependency 'bundler', '~> 1.16'
   spec.add_development_dependency 'pry'
