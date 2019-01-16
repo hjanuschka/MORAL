@@ -29,6 +29,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'rest-client'
+  spec.add_dependency 'pastel'
   spec.add_dependency 'sinatra'
   spec.add_dependency 'terminal-table'
   spec.add_dependency 'sinatra-contrib'

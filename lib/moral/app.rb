@@ -1,5 +1,6 @@
 require 'logger'
 require 'terminal-table'
+require 'pastel'
 module Moral
   class App
     def initialize
@@ -73,7 +74,7 @@ end
         @ipvs.update_table
       end
 
-
+  pastel = Pastel.new
   rows = []
   @cfg.balancers.each do | balancer |
     rows << [balancer.name, "", balancer.service_address, "UP", "STATS"]
@@ -83,7 +84,7 @@ end
   end
 
 
-table = Terminal::Table.new :title => "Overview", :headings => ['Balancer', 'Node', 'Address', 'State', 'Stats'], :rows => rows, :style => {:width => 80}
+  table = Terminal::Table.new :title => pastel.green("Overview"), :headings => ['Balancer', 'Node', 'Address', 'State', 'Stats'], :rows => rows, :style => {:width => 80}
 log_table table
 
 
