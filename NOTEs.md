@@ -1,4 +1,5 @@
 TODO:
+  - [  ] SLACK report , general health state overview + log
   - [  ] finish rspec
   - [  ] add udp health check
   - [  ] implement docker thread
