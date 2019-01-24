@@ -130,10 +130,10 @@ tmpl_varnish_nodes: &varnish_nodes_http
     address: 192.168.239.188
  
 tmp_nginx_ssl_nodes: &nginx_ssl_nodes
-  varnish1:
+  nginx1:
     <<: *https_node
     address: 192.168.239.96
-  varnish2:
+  nginx2:
     <<: *https_node
     address: 192.168.239.111
  
@@ -145,13 +145,30 @@ tmpl_ndb_nodes: &ndb_nodes
     <<: *mysql_node
     address: 192.168.239.101
 
+tmp_nginx_http_nodes: &nginx_http_nodes
+  nginx1:
+    <<: *http_node
+    address: 192.168.239.96
+  nginx2:
+    <<: *http_node
+    address: 192.168.239.111
+ 
+tmpl_ndb_nodes: &ndb_nodes
+  ngondo0:
+    <<: *mysql_node
+    address: 192.168.239.100
+  ngondo1:
+    <<: *mysql_node
+    address: 192.168.239.101
+
+
 balancers:
 
 
 # DEBUG WAY
   debug_ssl:
     protocol: TCP
-    scheduler: rr
+    scheduler: sed
     address: 192.168.239.5
     port: 443
     nodes:
@@ -165,7 +182,7 @@ balancers:
         port: 443
   debug_http:
     protocol: TCP
-    scheduler: rr
+    scheduler: sed
     address: 192.168.239.5
     port: 80
     nodes:
@@ -185,7 +202,7 @@ balancers:
 # Balancers for Coral
   coral_http:
     protocol: TCP
-    scheduler: rr
+    scheduler: sed
     address: 192.168.239.7
     port: 80
     nodes:
@@ -193,7 +210,7 @@ balancers:
 
   coral_https:
     protocol: TCP
-    scheduler: rr
+    scheduler: sed
     address: 192.168.239.7
     port: 444
     nodes:
@@ -202,7 +219,7 @@ balancers:
 # Varnish Balancer
   varnish_http:
     protocol: TCP
-    scheduler: rr
+    scheduler: sed
     address: 192.168.239.8
     port: 80
     nodes:
@@ -211,21 +228,31 @@ balancers:
 
 
 # SSL Balancer
-  nginx_balancer:
+  nginx_balancer_https:
     protocol: TCP
-    scheduler: rr
+    scheduler: sed
     address: 192.168.239.9
     port: 443
     nodes:
       <<: *nginx_ssl_nodes
 
 
+  nginx_balancer_http:
+    protocol: TCP
+    scheduler: sed
+    address: 192.168.239.9
+    port: 80
+    nodes:
+      <<: *nginx_http_nodes
+
+
+
 # MYSQL loadbalancer
   ndb_mysql:
     protocol: TCP
-    scheduler: rr
-    address: 192.168.239.9
-    port: 443
+    scheduler: sed
+    address: 192.168.239.8
+    port: 3306
     nodes:
       <<: *ndb_nodes
 
