@@ -37,7 +37,7 @@ module Moral
 
     def initialize
       ENV['MORAL_CONFIG'] ||= 'moral.yml'
-      @config = YAML.safe_load(File.read(ENV['MORAL_CONFIG']))
+      @config = YAML.safe_load(File.read(ENV['MORAL_CONFIG']),[],[], true)
       @balancers = []
       load_heartbeat
       load_balancers
@@ -132,6 +132,7 @@ module Moral
     end
 
     def load_balancers
+      @balancers = []
       @config['balancers'].each_pair do |name, options|
         balancer_config = OpenStruct.new(options)
         balancer = Balancer.new(name: name,

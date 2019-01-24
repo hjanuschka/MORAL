@@ -13,21 +13,21 @@ module Moral
       @logger = Logger.new(STDOUT)
       @logger.level = Logger::DEBUG # FIXME: log level by config
       @logger.formatter = proc do |severity, datetime, progname, msg|
-    date_format = datetime.strftime("%Y-%m-%d %H:%M:%S")
+        date_format = datetime.strftime("%Y-%m-%d %H:%M:%S")
         "[#{date_format}] #{severity}: #{msg}\n"
-end
+      end
       @logger
     end
 
     def log_table(table)
-     table.to_s.split("\n").each { |l| Moral::App.logger.debug l }
+      table.to_s.split("\n").each { |l| Moral::App.logger.debug l }
     end
+
     def run!
-#Moral::App.logger.debug
+      # Moral::App.logger.debug
       #
 
-
-#exit
+      # exit
 
       Signal.trap("INT") do
         Thread.new do
@@ -74,20 +74,17 @@ end
         @ipvs.update_table
       end
 
-  pastel = Pastel.new
-  rows = []
-  @cfg.balancers.each do | balancer |
-    rows << [balancer.name, "", balancer.service_address, "UP", "STATS"]
-      balancer.nodes.each do | node |
-        rows << ["", node.name, node.server_address, "UP", "STATS"]
+      pastel = Pastel.new
+      rows = []
+      @cfg.balancers.each do |balancer|
+        rows << [balancer.name, "", balancer.service_address, "UP", "STATS"]
+        balancer.nodes.each do |node|
+          rows << ["", node.name, node.server_address, "UP", "STATS"]
+        end
       end
-  end
 
-
-  table = Terminal::Table.new :title => pastel.green("Overview"), :headings => ['Balancer', 'Node', 'Address', 'State', 'Stats'], :rows => rows, :style => {:width => 80}
-log_table table
-
-
+      table = Terminal::Table.new title: pastel.green("Overview"), headings: ['Balancer', 'Node', 'Address', 'State', 'Stats'], rows: rows, style: { width: 80 }
+      log_table table
 
       # start threads
       #

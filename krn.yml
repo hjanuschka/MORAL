@@ -1,0 +1,232 @@
+type: ipvs
+heartbeat:
+  enabled: true
+  primary: "balancer1"
+  me: ${MORAL_HOSTNAME}
+  hosts:
+    - address: balancer1
+      port: 8088
+      name: balancer1
+    - address: balancer2
+      port: 8088
+      name: balancer2
+  health:
+    rise: 1
+    fall: 1
+    interval: 1
+    type: http_heartbeat
+    events:
+      rise:
+        - shell: "ifconfig eth0:0 192.168.239.7 up"
+      fall:
+        - shell: "ifconfig eth0:0 down"
+    definition:
+      endpoint: /health
+      timeout: 2
+      headers:
+        Host: "www.krone.at"
+      expected:
+        status: 200
+
+
+#SOME globals
+# define nodes BASE SSL node
+http1: &http_node
+  active: true
+  type: node
+  routing: g
+  weight: 1
+  address: 192.168.239.96
+  port: 80
+  health:
+    intervall: 1
+    dead_on: 1
+    back_on: 1
+    type: http
+    definition:
+      timeout: 2
+      protocol: http
+      endpoint: "/"
+      expected:
+        status: 200
+
+
+ssl1: &https_node
+  active: true
+  type: node
+  routing: g
+  weight: 1
+  address: 192.168.239.96
+  port: 443
+  health:
+    intervall: 1
+    dead_on: 1
+    back_on: 1
+    type: http
+    definition:
+      timeout: 2
+      protocol: https
+      endpoint: "/"
+      expected:
+        status: 200
+
+tmpl_mysql_node: &mysql_node
+  active: true
+  type: node
+  routing: g
+  weight: 1
+  address: 192.168.239.96
+  port: 3306
+  health:
+    intervall: 1
+    dead_on: 1
+    back_on: 1
+    type: tcp
+    definition:
+      timeout: 2
+
+
+
+tmpl_coral_nodes: &coral_nodes_http
+  coral1:
+    <<: *http_node
+    address: 192.168.239.32
+  coral2:
+    <<: *http_node
+    address: 192.168.239.36
+  coral3:
+    <<: *http_node
+    address: 192.168.239.37
+  coral4:
+    <<: *http_node
+    address: 192.168.239.64
+
+
+tmpl_coral_nodes_https: &coral_nodes_https
+  coral1:
+    <<: *https_node
+    address: 192.168.239.32
+    port: 444
+  coral2:
+    <<: *https_node
+    address: 192.168.239.36
+    port: 444
+  coral3:
+    <<: *https_node
+    address: 192.168.239.37
+    port: 444
+  coral4:
+    <<: *https_node
+    port: 444
+    address: 192.168.239.64
+
+
+tmpl_varnish_nodes: &varnish_nodes_http
+  varnish1:
+    <<: *http_node
+    address: 192.168.239.182
+  varnish2:
+    <<: *http_node
+    address: 192.168.239.188
+ 
+tmp_nginx_ssl_nodes: &nginx_ssl_nodes
+  varnish1:
+    <<: *https_node
+    address: 192.168.239.96
+  varnish2:
+    <<: *https_node
+    address: 192.168.239.111
+ 
+tmpl_ndb_nodes: &ndb_nodes
+  ngondo0:
+    <<: *mysql_node
+    address: 192.168.239.100
+  ngondo1:
+    <<: *mysql_node
+    address: 192.168.239.101
+
+balancers:
+
+
+# DEBUG WAY
+  debug_ssl:
+    protocol: TCP
+    scheduler: rr
+    address: 192.168.239.5
+    port: 443
+    nodes:
+      ssl1:
+        <<: *https_node
+        address: 192.168.239.96
+        port: 443
+      ssl2:
+        <<: *https_node
+        address: 192.168.239.111
+        port: 443
+  debug_http:
+    protocol: TCP
+    scheduler: rr
+    address: 192.168.239.5
+    port: 80
+    nodes:
+      ssl1:
+        <<: *http_node
+        address: 192.168.239.96
+        port: 80
+      ssl2:
+        <<: *http_node
+        address: 192.168.239.111
+        port: 80
+ 
+
+
+
+
+# Balancers for Coral
+  coral_http:
+    protocol: TCP
+    scheduler: rr
+    address: 192.168.239.7
+    port: 80
+    nodes:
+      <<: *coral_nodes_http
+
+  coral_https:
+    protocol: TCP
+    scheduler: rr
+    address: 192.168.239.7
+    port: 444
+    nodes:
+      <<: *coral_nodes_https
+
+# Varnish Balancer
+  varnish_http:
+    protocol: TCP
+    scheduler: rr
+    address: 192.168.239.8
+    port: 80
+    nodes:
+      <<: *varnish_nodes_http
+
+
+
+# SSL Balancer
+  nginx_balancer:
+    protocol: TCP
+    scheduler: rr
+    address: 192.168.239.9
+    port: 443
+    nodes:
+      <<: *nginx_ssl_nodes
+
+
+# MYSQL loadbalancer
+  ndb_mysql:
+    protocol: TCP
+    scheduler: rr
+    address: 192.168.239.9
+    port: 443
+    nodes:
+      <<: *ndb_nodes
+
+

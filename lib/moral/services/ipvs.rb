@@ -63,6 +63,7 @@ module Moral
           # FIXMEEEE
           balancer.remove_gone!
         else
+          puts "CREATE"
           balancer.create!
         end
       end
