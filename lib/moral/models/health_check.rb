@@ -41,6 +41,7 @@ module Moral
 
       :good
     rescue StandardError
+      Moral::App.logger.debug "TCP -> #{@node.address}:#{@node.port} failed: #{x.message}"
       :bad
     end
 

@@ -19,10 +19,6 @@ module Moral
       @logger
     end
 
-    def log_table(table)
-      table.to_s.split("\n").each { |l| Moral::App.logger.debug l }
-    end
-
     def run!
       # Moral::App.logger.debug
       #
@@ -73,18 +69,6 @@ module Moral
         @ipvs = Moral::IPVS.new
         @ipvs.update_table
       end
-
-      pastel = Pastel.new
-      rows = []
-      @cfg.balancers.each do |balancer|
-        rows << [balancer.name, "", balancer.service_address, "UP", "STATS"]
-        balancer.nodes.each do |node|
-          rows << ["", node.name, node.server_address, "UP", "STATS"]
-        end
-      end
-
-      table = Terminal::Table.new title: pastel.green("Overview"), headings: ['Balancer', 'Node', 'Address', 'State', 'Stats'], rows: rows, style: { width: 80 }
-      log_table table
 
       # start threads
       #

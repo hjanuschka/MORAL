@@ -17,6 +17,7 @@ module Moral
         end
         return :good
       rescue StandardError => x
+        Moral::App.logger.debug "HTTP -> #{url} failed: #{x.message}"
         return :bad
       end
     end

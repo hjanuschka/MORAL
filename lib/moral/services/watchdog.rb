@@ -6,6 +6,7 @@ module Moral
     end
 
     def run!
+      pastel = Pastel.new
       loop do
         checks = []
         Moral::Config.instance.balancers.each do |balancer|
@@ -31,12 +32,14 @@ module Moral
               c.retain_count += 1
             end
             if c.last_state == :good && c.retain_count == c.back_on && c.state_changed
-              Moral::App.logger.debug "bringing up: #{node.server_address}"
+
+              Moral::App.logger.info pastel.green("#{node.server_address} came to live ❤️")
               node.rise!
             end
 
             if c.last_state == :bad && c.retain_count == c.back_on && c.state_changed
-              Moral::App.logger.debug "bringing down: #{node.server_address}"
+              Moral::App.logger.info pastel.yellow(node.balancer.name.to_s)
+              Moral::App.logger.info pastel.orange("#{node.server_address} died 💔")
               node.fall!
             end
           end

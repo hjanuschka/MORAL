@@ -67,6 +67,22 @@ module Moral
           balancer.create!
         end
       end
+      log_table
+    end
+
+    def log_table
+      pastel = Pastel.new
+      rows = []
+      @cfg.balancers.each do |balancer|
+        rows << [balancer.name, "", balancer.service_address, "UP", "STATS"]
+        balancer.nodes.each do |node|
+          rows << ["", node.name, node.server_address, "UP", "STATS"]
+        end
+      end
+
+      table = Terminal::Table.new title: pastel.green("Overview"), headings: ['Balancer', 'Node', 'Address', 'State', 'Stats'], rows: rows, style: { width: 80 }
+
+      table.to_s.split("\n").each { |l| Moral::App.logger.info l }
     end
 
     def load_table

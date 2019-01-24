@@ -37,7 +37,7 @@ module Moral
 
     def initialize
       ENV['MORAL_CONFIG'] ||= 'moral.yml'
-      @config = YAML.safe_load(File.read(ENV['MORAL_CONFIG']),[],[], true)
+      @config = YAML.safe_load(File.read(ENV['MORAL_CONFIG']), [], [], true)
       @balancers = []
       load_heartbeat
       load_balancers

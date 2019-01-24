@@ -44,7 +44,7 @@ http1: &http_node
     back_on: 1
     type: http
     definition:
-      timeout: 2
+      timeout: 5
       protocol: http
       endpoint: "/"
       expected:
@@ -64,7 +64,7 @@ ssl1: &https_node
     back_on: 1
     type: http
     definition:
-      timeout: 2
+      timeout: 5
       protocol: https
       endpoint: "/"
       expected:
